@@ -9,3 +9,16 @@ updates:
           patterns:
             - "*"
       open-pull-requests-limit: 3
+
+    - package-ecosystem: 'docker'
+      directory: '/'
+      schedule:
+          interval: 'weekly'
+      open-pull-requests-limit: 3
+      # Solo vigila la imagen base (`FROM alpine:3.23`) y cualquier otra
+      # imagen referenciada por tag/digest en el Dockerfile. NO puede
+      # detectar builds nuevos de FiveM: el artifact de Enhanced no es
+      # un tag de un registry Docker, es un tarball que se descubre
+      # scrapeando docs.fivem.net (ver scripts/update-enhanced-build.sh
+      # y ops-docs/conventions/fivem-enhanced-artifact-update.md). Eso
+      # lo sigue haciendo el cron de este mismo workflow.
