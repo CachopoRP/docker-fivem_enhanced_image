@@ -6,6 +6,12 @@ on:
   schedule:
     - cron: "17 4 * * *"
   workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Reconstruir y publicar la imagen aunque no haya build nuevo de Enhanced'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -44,6 +50,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           BUILD: ${{ steps.release.outputs.build }}
           REF: ${{ github.ref_name }}
+          FORCE: ${{ inputs.force_rebuild }}
         run: |
           if [ "$NEW_BUILD" = "true" ]; then
             rebuild=true
@@ -51,9 +58,9 @@ jobs:
           elif [ "$EVENT" = "push" ]; then
             rebuild=true
             reason="commits pushed to $REF"
-          elif [ "$EVENT" = "workflow_dispatch" ]; then
+          elif [ "$EVENT" = "workflow_dispatch" ] && [ "$FORCE" = "true" ]; then
             rebuild=true
-            reason="manual run"
+            reason="manual run with force_rebuild"
           else
             rebuild=false
             reason="already on Enhanced build $BUILD and no new commits"
